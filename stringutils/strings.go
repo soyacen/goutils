@@ -9,7 +9,7 @@ func IsEmpty(s string) bool {
 
 // IsNotEmpty Checks if a string is not empty ("")
 func IsNotEmpty(s string) bool {
-	return len(s) != 0
+	return !IsEmpty(s)
 }
 
 // IsAllEmpty Checks if all of the strings are empty ("")
@@ -39,7 +39,7 @@ func IsBlank(s string) bool {
 
 // IsNotBlank Checks if a string is not empty ("") and not whitespace only.
 func IsNotBlank(s string) bool {
-	return len(strings.TrimSpace(s)) == 0
+	return !IsBlank(s)
 }
 
 // IsAllBlank Checks if all of the CharSequences are empty ("") or whitespace only.

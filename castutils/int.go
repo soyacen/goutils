@@ -119,3 +119,123 @@ func ToRune(v interface{}) rune {
 	result, _ := v.(rune)
 	return result
 }
+
+func IsUIntSlice(v interface{}) bool {
+	_, ok := v.([]uint)
+	return ok
+}
+
+func ToUIntSlice(v interface{}) []uint {
+	result, _ := v.([]uint)
+	return result
+}
+
+func IsUInt8Slice(v interface{}) bool {
+	_, ok := v.([]uint8)
+	return ok
+}
+
+func ToUInt8Slice(v interface{}) []uint8 {
+	result, _ := v.([]uint8)
+	return result
+}
+
+func IsUInt16Slice(v interface{}) bool {
+	_, ok := v.([]uint16)
+	return ok
+}
+
+func ToUInt16Slice(v interface{}) []uint16 {
+	result, _ := v.([]uint16)
+	return result
+}
+
+func IsUInt32Slice(v interface{}) bool {
+	_, ok := v.([]uint32)
+	return ok
+}
+
+func ToUInt32Slice(v interface{}) []uint32 {
+	result, _ := v.([]uint32)
+	return result
+}
+
+func IsUInt64Slice(v interface{}) bool {
+	_, ok := v.([]uint64)
+	return ok
+}
+
+func ToUInt64Slice(v interface{}) []uint64 {
+	result, _ := v.([]uint64)
+	return result
+}
+
+func IsIntSlice(v interface{}) bool {
+	_, ok := v.([]int)
+	return ok
+}
+
+func ToIntSlice(v interface{}) []int {
+	result, _ := v.([]int)
+	return result
+}
+
+func IsInt8Slice(v interface{}) bool {
+	_, ok := v.([]int8)
+	return ok
+}
+
+func ToInt8Slice(v interface{}) []int8 {
+	result, _ := v.([]int8)
+	return result
+}
+
+func IsInt16Slice(v interface{}) bool {
+	_, ok := v.([]int16)
+	return ok
+}
+
+func ToInt16Slice(v interface{}) []int16 {
+	result, _ := v.([]int16)
+	return result
+}
+
+func IsInt32Slice(v interface{}) bool {
+	_, ok := v.([]int32)
+	return ok
+}
+
+func ToInt32Slice(v interface{}) []int32 {
+	result, _ := v.([]int32)
+	return result
+}
+
+func IsInt64Slice(v interface{}) bool {
+	_, ok := v.([]int64)
+	return ok
+}
+
+func ToInt64Slice(v interface{}) []int64 {
+	result, _ := v.([]int64)
+	return result
+}
+
+func IsByteSlice(v interface{}) bool {
+	_, ok := v.([]byte)
+	return ok
+}
+
+func ToByteSlice(v interface{}) []byte {
+	result, _ := v.([]byte)
+	return result
+}
+
+func IsRuneSlice(v interface{}) bool {
+	_, ok := v.([]rune)
+	return ok
+}
+
+func ToRuneSlice(v interface{}) []rune {
+	result, _ := v.([]rune)
+	return result
+}

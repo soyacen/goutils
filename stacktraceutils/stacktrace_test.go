@@ -1,4 +1,4 @@
-package stacktraceutil
+package stacktraceutils
 
 import (
 	"strings"

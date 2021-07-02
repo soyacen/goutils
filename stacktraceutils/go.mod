@@ -1,4 +1,4 @@
-module github.com/soyacen/goutils/stacktraceutil
+module github.com/soyacen/goutils/stacktraceutils
 
 go 1.15
 

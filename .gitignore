@@ -16,3 +16,5 @@
 
 .idea
 /bitutils/go.sum
+/backoffutils/go.sum
+/go.sum

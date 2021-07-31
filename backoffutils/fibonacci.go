@@ -8,19 +8,11 @@ import (
 // Fibonacci it waits for "delta * fibonacci(attempt)" time between calls.
 func Fibonacci(delta time.Duration) BackoffFunc {
 	return func(ctx context.Context, attempt uint) time.Duration {
-		return fibonacci(attempt, delta)
+		return fibonacci(delta, attempt)
 	}
 }
 
-// FibonacciWithJitter creates an fibonacci backoff like Fibonacci does,
-// but adds jitter (fractional adjustment).
-func FibonacciWithJitter(delta time.Duration, jitterFraction float64) BackoffFunc {
-	return func(ctx context.Context, attempt uint) time.Duration {
-		return JitterUp(fibonacci(attempt, delta), jitterFraction)
-	}
-}
-
-func fibonacci(attempt uint, delta time.Duration) time.Duration {
+func fibonacci(delta time.Duration, attempt uint) time.Duration {
 	var (
 		pre int64
 		cur int64

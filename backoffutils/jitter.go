@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-// JitterUp adds random jitter to the duration.
+// JitterUp adds random jitter to the interval.
 //
-// This adds or subtracts time from the duration within a given jitter fraction.
+// This adds or subtracts time from the interval within a given jitter fraction.
 // For example for 10s and jitter 0.1, it will return a time within [9s, 11s])
 func JitterUp(backoff BackoffFunc, jitter float64) BackoffFunc {
 	return func(ctx context.Context, attempt uint) time.Duration {
@@ -17,7 +17,7 @@ func JitterUp(backoff BackoffFunc, jitter float64) BackoffFunc {
 	}
 }
 
-func jitterUp(duration time.Duration, jitter float64) time.Duration {
+func jitterUp(interval time.Duration, jitter float64) time.Duration {
 	multiplier := jitter * (rand.Float64()*2 - 1)
-	return time.Duration(float64(duration) * (1 + multiplier))
+	return time.Duration(float64(interval) * (1 + multiplier))
 }

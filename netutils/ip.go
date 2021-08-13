@@ -104,14 +104,8 @@ func IsUnspecified(ipAddr string) bool {
 	return ip.IsUnspecified()
 }
 
-// RealIP get a public IP address
-func RealIP(host string) (string, error) {
-	// if addr specified then its returned
-	if len(host) > 0 {
-		if host != "0.0.0.0" && host != "[::]" && host != "::" {
-			return host, nil
-		}
-	}
+// PublicIP get a public IP address
+func PublicIP() (string, error) {
 	var privateIPs []string
 	var publicIPs []string
 	var loopbackIPs []string

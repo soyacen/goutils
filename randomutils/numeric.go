@@ -1,16 +1,8 @@
 package randomutils
 
 import (
-	"math/rand"
 	"strconv"
-	"time"
 )
-
-var r *rand.Rand
-
-func init() {
-	r = rand.New(rand.NewSource(time.Now().UnixNano()))
-}
 
 func Intn(n int) int {
 	return r.Intn(n)

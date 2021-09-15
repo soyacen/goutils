@@ -1,10 +1,14 @@
 package fileutils
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 // IsExist returns a boolean indicating whether a file or directory exist.
 func IsExist(filepath string) bool {
-	_, err := os.Stat(filepath)
+	info, err := os.Stat(filepath)
+	fmt.Println(info)
 	if err == nil {
 		return true
 	}

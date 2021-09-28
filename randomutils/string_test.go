@@ -36,4 +36,6 @@ func TestWordString(t *testing.T) {
 	assert.Len(t, permString, 30)
 	permString = randomutils.WordString(39)
 	assert.Len(t, permString, 39)
+	permString = randomutils.WordString(16)
+	t.Log(permString)
 }

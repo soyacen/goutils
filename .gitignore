@@ -20,3 +20,4 @@
 /go.sum
 /netutils/go.sum
 /fileutils/go.sum
+/retryutils/go.sum

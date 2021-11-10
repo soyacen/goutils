@@ -7,7 +7,7 @@ import (
 	"github.com/soyacen/goutils/backoffutils"
 )
 
-func Call(ctx context.Context, method func() error, maxAttempts int, backoffFunc backoffutils.BackoffFunc) error {
+func Call(ctx context.Context, maxAttempts int, backoffFunc backoffutils.BackoffFunc, method func() error) error {
 	var err error
 	for i := 0; i <= maxAttempts; i++ {
 		// call method

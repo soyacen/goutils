@@ -109,7 +109,8 @@ func PublicIP() (string, error) {
 	var privateIPs []string
 	var publicIPs []string
 	var loopbackIPs []string
-	for _, ipAddr := range IPs() {
+	ips := IPs()
+	for _, ipAddr := range ips {
 		ip := net.ParseIP(ipAddr)
 		if ip == nil {
 			continue
@@ -131,6 +132,28 @@ func PublicIP() (string, error) {
 		return publicIPs[0], nil
 	} else if len(loopbackIPs) > 0 {
 		return loopbackIPs[0], nil
+	}
+	return "", fmt.Errorf("no real IP address found")
+}
+
+// InterfaceIP get a public IP address
+func InterfaceIP(name string) (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", nil
+	}
+	for _, iface := range ifaces {
+		addrs, err := iface.Addrs()
+		if err != nil {
+			continue
+		}
+		if iface.Name == name {
+			for _, addr := range addrs {
+				if ip := AddrToIP(addr); ip != nil {
+					return net.ParseIP(ip.String()).String(), nil
+				}
+			}
+		}
 	}
 	return "", fmt.Errorf("no real IP address found")
 }

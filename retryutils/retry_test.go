@@ -15,12 +15,11 @@ import (
 
 func TestCall(t *testing.T) {
 	maxAttempts := 3
-	invokeTimes := 0
 	ctx := context.Background()
-	method := func() error {
-		fmt.Println(invokeTimes)
-		if invokeTimes < maxAttempts {
-			invokeTimes++
+	method := func(attemptTime int) error {
+		fmt.Println(attemptTime)
+		if attemptTime < maxAttempts {
+			attemptTime++
 			return errors.New("mock error")
 		}
 		return nil

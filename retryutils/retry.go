@@ -7,12 +7,12 @@ import (
 	"github.com/soyacen/goutils/backoffutils"
 )
 
-func Call(ctx context.Context, maxAttempts uint, backoffFunc backoffutils.BackoffFunc, method func() error) error {
+func Call(ctx context.Context, maxAttempts uint, backoffFunc backoffutils.BackoffFunc, method func(attemptTime int) error) error {
 	var err error
 	max := int(maxAttempts)
 	for i := 0; i <= max; i++ {
 		// call method
-		err = method()
+		err = method(i)
 
 		// if method not return error, no need to retry
 		if err == nil {

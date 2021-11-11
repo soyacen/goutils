@@ -26,6 +26,6 @@ func TestCall(t *testing.T) {
 		return nil
 	}
 	backoffFunc := backoffutils.Constant(time.Second)
-	err := retryutils.Call(ctx, maxAttempts, backoffFunc, method)
+	err := retryutils.Call(ctx, uint(maxAttempts), backoffFunc, method)
 	assert.Nil(t, err)
 }

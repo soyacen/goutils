@@ -1,6 +1,7 @@
 package stacktraceutils
 
 import (
+	"path/filepath"
 	"runtime"
 	"sync"
 
@@ -14,6 +15,37 @@ var (
 		},
 	}
 )
+
+func FileLine(short bool) string {
+	skip := 0
+	buffer := bytebufferpool.Get()
+	defer buffer.Free()
+	programCounters := _stacktracePool.Get().(*programCounters)
+	defer _stacktracePool.Put(programCounters)
+
+	var numFrames int
+	for {
+		numFrames = runtime.Callers(skip+2, programCounters.pcs)
+		if numFrames < len(programCounters.pcs) {
+			break
+		}
+		programCounters = newProgramCounters(len(programCounters.pcs) * 2)
+	}
+
+	frames := runtime.CallersFrames(programCounters.pcs[:numFrames])
+	if frame, more := frames.Next(); more {
+		file := frame.File
+		if short {
+			buffer.WriteString(filepath.Base(file))
+		} else {
+			buffer.WriteString(file)
+		}
+		buffer.WriteByte(':')
+		buffer.AppendInt(int64(frame.Line))
+	}
+
+	return buffer.String()
+}
 
 func CallersFrames(skip int) string {
 	buffer := bytebufferpool.Get()

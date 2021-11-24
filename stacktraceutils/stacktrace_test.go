@@ -53,3 +53,8 @@ func BenchmarkTakeStacktrace(b *testing.B) {
 		CallersFrames(0)
 	}
 }
+
+func TestFileLine(t *testing.T) {
+	t.Log(FileLine(false))
+	t.Log(FileLine(true))
+}

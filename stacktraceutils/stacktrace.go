@@ -15,7 +15,7 @@ var (
 	}
 )
 
-func TakeStacktrace(skip int) string {
+func CallersFrames(skip int) string {
 	buffer := bytebufferpool.Get()
 	defer buffer.Free()
 	programCounters := _stacktracePool.Get().(*programCounters)

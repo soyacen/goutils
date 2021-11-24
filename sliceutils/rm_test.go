@@ -3,6 +3,8 @@ package sliceutils
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRemoveString(t *testing.T) {
@@ -66,4 +68,11 @@ func TestRemoveString(t *testing.T) {
 			}
 		}
 	}
+
+	slice := []string{"this", "is", "test", "slice"}
+	index := 3
+	expected := []string{"this", "is", "test"}
+
+	res := append(slice[:index], slice[index+1:]...)
+	assert.Equal(t, expected, res)
 }

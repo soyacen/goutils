@@ -42,7 +42,7 @@ func IPs() []string {
 			continue
 		}
 		for _, addr := range addrs {
-			if ip := ExtractToIP(addr); ip != nil {
+			if ip := ExtractIP(addr); ip != nil {
 				ips = append(ips, ip.String())
 			}
 		}
@@ -55,8 +55,8 @@ func LocalIPs() []string {
 	return IPs()
 }
 
-// ExtractToIP extract IP from net.Addr
-func ExtractToIP(addr net.Addr) net.IP {
+// ExtractIP extract IP from net.Addr
+func ExtractIP(addr net.Addr) net.IP {
 	switch v := addr.(type) {
 	case *net.IPAddr:
 		return v.IP
@@ -149,7 +149,7 @@ func InterfaceIP(name string) (string, error) {
 		}
 		if iface.Name == name {
 			for _, addr := range addrs {
-				if ip := ExtractToIP(addr); ip != nil {
+				if ip := ExtractIP(addr); ip != nil {
 					return net.ParseIP(ip.String()).String(), nil
 				}
 			}

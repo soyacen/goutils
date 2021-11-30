@@ -13,7 +13,7 @@ func TestPublicIP(t *testing.T) {
 }
 
 func TestInterfaceIP(t *testing.T) {
-	ip, err := InterfaceIP("en7")
+	ip, err := InterfaceIPs("en7")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, ip)
 	t.Log(ip)

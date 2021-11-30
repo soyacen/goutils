@@ -5,56 +5,6 @@ import (
 	"net"
 )
 
-var (
-	privateBlocks map[*net.IPNet]struct{}
-)
-
-func init() {
-	privateBlocks = make(map[*net.IPNet]struct{})
-	AppendPrivateBlocks(
-		"10.0.0.0/8",
-		"172.16.0.0/12",
-		"192.168.0.0/16",
-		"100.64.0.0/10",
-		"fd00::/8",
-	)
-}
-
-// AppendPrivateBlocks append private network blocks
-func AppendPrivateBlocks(bs ...string) {
-	for _, b := range bs {
-		if _, block, err := net.ParseCIDR(b); err == nil {
-			privateBlocks[block] = struct{}{}
-		}
-	}
-}
-
-// IPs get all IP addresses
-func IPs() []string {
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return nil
-	}
-	var ips []string
-	for _, iface := range ifaces {
-		addrs, err := iface.Addrs()
-		if err != nil {
-			continue
-		}
-		for _, addr := range addrs {
-			if ip := ExtractIP(addr); ip != nil {
-				ips = append(ips, ip.String())
-			}
-		}
-	}
-	return ips
-}
-
-// LocalIPs get all IP addresses of the local machine
-func LocalIPs() []string {
-	return IPs()
-}
-
 // ExtractIP extract IP from net.Addr
 func ExtractIP(addr net.Addr) net.IP {
 	switch v := addr.(type) {
@@ -71,89 +21,101 @@ func ExtractIP(addr net.Addr) net.IP {
 	}
 }
 
-// IsPrivateIP Determine if the IP address is private
-func IsPrivateIP(ipAddr string) bool {
-	ip := net.ParseIP(ipAddr)
-	if ip == nil {
-		return false
-	}
-	for block := range privateBlocks {
-		if block.Contains(ip) {
-			return true
-		}
-	}
-	return false
-}
-
-// IsLoopback reports whether ipAddr is a loopback address.
-func IsLoopback(ipAddr string) bool {
-	ip := net.ParseIP(ipAddr)
-	if ip == nil {
-		return false
-	}
-	return ip.IsLoopback()
-}
-
-// IsUnspecified reports whether ipAddr is an unspecified address, either
-// the IPv4 address "0.0.0.0" or the IPv6 address "::".
-func IsUnspecified(ipAddr string) bool {
-	ip := net.ParseIP(ipAddr)
-	if ip == nil {
-		return false
-	}
-	return ip.IsUnspecified()
-}
-
-// PublicIP get a public IP address
-func PublicIP() (string, error) {
-	var privateIPs []string
-	var publicIPs []string
-	var loopbackIPs []string
+// GlobalUnicastIP get a global unicast IP address
+func GlobalUnicastIP() (net.IP, error) {
 	ips := IPs()
-	for _, ipAddr := range ips {
-		ip := net.ParseIP(ipAddr)
-		if ip == nil {
-			continue
-		}
+	for _, ip := range ips {
 		if ip.IsUnspecified() {
 			continue
 		}
 		if ip.IsLoopback() {
-			loopbackIPs = append(loopbackIPs, ipAddr)
-		} else if IsPrivateIP(ipAddr) {
-			privateIPs = append(privateIPs, ipAddr)
-		} else {
-			publicIPs = append(publicIPs, ipAddr)
+			continue
+		}
+		if ip.IsLinkLocalUnicast() {
+			continue
+		}
+
+		if ip.IsInterfaceLocalMulticast() {
+			continue
+		}
+		if ip.IsLinkLocalMulticast() {
+			continue
+		}
+		if ip.IsMulticast() {
+			continue
+		}
+		if ip.IsGlobalUnicast() {
+			return ip, nil
 		}
 	}
-	if len(privateIPs) > 0 {
-		return privateIPs[0], nil
-	} else if len(publicIPs) > 0 {
-		return publicIPs[0], nil
-	} else if len(loopbackIPs) > 0 {
-		return loopbackIPs[0], nil
-	}
-	return "", fmt.Errorf("no real IP address found")
+	return nil, fmt.Errorf("no found global unicast IP")
 }
 
-// InterfaceIP get a public IP address
-func InterfaceIP(name string) (string, error) {
+// IPs get all IP addresses
+func IPs() []net.IP {
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		return "", nil
+		return nil
 	}
+	var ips []net.IP
 	for _, iface := range ifaces {
 		addrs, err := iface.Addrs()
 		if err != nil {
 			continue
 		}
-		if iface.Name == name {
-			for _, addr := range addrs {
-				if ip := ExtractIP(addr); ip != nil {
-					return net.ParseIP(ip.String()).String(), nil
-				}
+		for _, addr := range addrs {
+			ip := ExtractIP(addr)
+			if len(ip) == 0 {
+				continue
 			}
+			ips = append(ips, ip)
 		}
 	}
-	return "", fmt.Errorf("no real IP address found")
+	return ips
+}
+
+// InterfaceIPs get public IP addresses by interface name
+func InterfaceIPs(name string) ([]net.IP, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+	var ips []net.IP
+	for _, iface := range ifaces {
+		addrs, err := iface.Addrs()
+		if err != nil {
+			continue
+		}
+		if iface.Name != name {
+			continue
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			ip = ExtractIP(addr)
+			if len(ip) == 0 {
+				continue
+			}
+			ips = append(ips, ip)
+		}
+	}
+	if len(ips) == 0 {
+		return nil, fmt.Errorf("not found the ip of interface %s", name)
+	}
+	return ips, nil
+}
+
+// InterfaceIPv4 get a public IPv4 address
+func InterfaceIPv4(name string) (net.IP, error) {
+	ips, err := InterfaceIPs(name)
+	if err != nil {
+		return nil, err
+	}
+	for _, ip := range ips {
+		ip = ip.To4()
+		if len(ip) == 0 {
+			continue
+		}
+		return ip, nil
+	}
+	return nil, fmt.Errorf("not found the ipv4 of interface %s", name)
 }

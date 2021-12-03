@@ -25,15 +25,6 @@ type SignalWaiter struct {
 
 type Option func(*SignalWaiter)
 
-func Signals(signals ...os.Signal) Option {
-	return func(waiter *SignalWaiter) {
-		waiter.signals = make([]os.Signal, 0)
-		for _, signal := range signals {
-			waiter.signals = append(waiter.signals, signal)
-		}
-	}
-}
-
 func Context(parent context.Context) Option {
 	return func(waiter *SignalWaiter) {
 		waiter.ctx, waiter.cancelFunc = context.WithCancel(parent)
@@ -54,10 +45,10 @@ func WaitUntilTimeout(d time.Duration) Option {
 	}
 }
 
-func NewSignalWaiter(opts ...Option) *SignalWaiter {
+func NewSignalWaiter(signals []os.Signal, opts ...Option) *SignalWaiter {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	w := &SignalWaiter{
-		signals:          ShutdownSignals(),
+		signals:          signals,
 		signalC:          make(chan os.Signal),
 		ctx:              ctx,
 		cancelFunc:       cancelFunc,

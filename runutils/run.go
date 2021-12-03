@@ -1,62 +1,29 @@
 package runutils
 
 import (
-	"context"
 	"log"
 	"runtime/debug"
 	"time"
 )
 
-type Runner struct {
-	start    func(ctx context.Context) error
-	startCtx context.Context
-	stop     func(ctx context.Context) error
-	stopCtx  context.Context
+type WaitRunner struct {
+	execute  func() error
 	waitTime time.Duration
 	recover  func(v interface{})
 }
 
-type Option func(r *Runner)
-
-func StartCtx(ctx context.Context) Option {
-	return func(r *Runner) {
-		r.startCtx = ctx
-	}
-}
-
-func Stop(method func(ctx context.Context) error) Option {
-	return func(r *Runner) {
-		r.stop = method
-	}
-}
-
-func StopCtx(ctx context.Context) Option {
-	return func(r *Runner) {
-		r.stopCtx = ctx
-	}
-}
-
-func WaitTime(t time.Duration) Option {
-	return func(r *Runner) {
-		r.waitTime = t
-	}
-}
+type Option func(r *WaitRunner)
 
 func Recover(method func(v interface{})) Option {
-	return func(r *Runner) {
+	return func(r *WaitRunner) {
 		r.recover = method
 	}
 }
 
-func NewRunner(start func(ctx context.Context) error, opts ...Option) *Runner {
-	r := &Runner{
-		start:    start,
-		startCtx: context.Background(),
-		stop: func(ctx context.Context) error {
-			return nil
-		},
-		stopCtx:  context.Background(),
-		waitTime: 0,
+func NewRunner(execute func() error, waitTime time.Duration, opts ...Option) *WaitRunner {
+	r := &WaitRunner{
+		execute:  execute,
+		waitTime: waitTime,
 		recover: func(v interface{}) {
 			log.Printf("panic: %s\n", v)
 			debug.PrintStack()
@@ -68,7 +35,7 @@ func NewRunner(start func(ctx context.Context) error, opts ...Option) *Runner {
 	return r
 }
 
-func (r *Runner) Run() error {
+func (r *WaitRunner) Run() error {
 	errC := make(chan error, 1)
 
 	go func() {
@@ -77,19 +44,16 @@ func (r *Runner) Run() error {
 				r.recover(v)
 			}
 		}()
-		if err := r.start(r.startCtx); err != nil {
+		if err := r.execute(); err != nil {
 			errC <- err
 		}
 		close(errC)
 	}()
 
+	var err error
 	select {
 	case <-time.After(r.waitTime):
-	case err := <-errC:
-		if err != nil {
-			return err
-		}
+	case err = <-errC:
 	}
-
-	return r.stop(r.stopCtx)
+	return err
 }

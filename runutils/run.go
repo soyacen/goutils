@@ -6,22 +6,22 @@ import (
 	"time"
 )
 
-type WaitRunner struct {
+type Runner struct {
 	execute  func() error
 	waitTime time.Duration
 	recover  func(v interface{})
 }
 
-type Option func(r *WaitRunner)
+type Option func(r *Runner)
 
 func Recover(method func(v interface{})) Option {
-	return func(r *WaitRunner) {
+	return func(r *Runner) {
 		r.recover = method
 	}
 }
 
-func NewRunner(execute func() error, waitTime time.Duration, opts ...Option) *WaitRunner {
-	r := &WaitRunner{
+func NewRunner(execute func() error, waitTime time.Duration, opts ...Option) *Runner {
+	r := &Runner{
 		execute:  execute,
 		waitTime: waitTime,
 		recover: func(v interface{}) {
@@ -35,7 +35,7 @@ func NewRunner(execute func() error, waitTime time.Duration, opts ...Option) *Wa
 	return r
 }
 
-func (r *WaitRunner) Run() error {
+func (r *Runner) Run() error {
 	errC := make(chan error, 1)
 
 	go func() {

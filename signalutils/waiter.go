@@ -1,7 +1,6 @@
 package signalutils
 
 import (
-	"context"
 	"os"
 	"os/signal"
 	"sync"
@@ -12,54 +11,24 @@ import (
 type SignalHook = map[os.Signal]func()
 
 type SignalWaiter struct {
-	signals          []os.Signal
-	signalC          chan os.Signal
-	ctx              context.Context
-	cancelFunc       context.CancelFunc
-	incomingSignal   os.Signal
-	hooks            []func(os.Signal)
-	waitUntilTimeout time.Duration
-	stopC            chan interface{}
+	signals        []os.Signal
+	signalC        chan os.Signal
+	incomingSignal os.Signal
+	hooks          []func(os.Signal)
+	waitTimeout    time.Duration
+	stopC          chan interface{}
 	sync.RWMutex
 }
 
-type Option func(*SignalWaiter)
-
-func Context(parent context.Context) Option {
-	return func(waiter *SignalWaiter) {
-		waiter.ctx, waiter.cancelFunc = context.WithCancel(parent)
-	}
-}
-
-func Hooks(hooks ...func(os.Signal)) Option {
-	return func(waiter *SignalWaiter) {
-		for _, hook := range hooks {
-			waiter.hooks = append(waiter.hooks, hook)
-		}
-	}
-}
-
-func WaitUntilTimeout(d time.Duration) Option {
-	return func(waiter *SignalWaiter) {
-		waiter.waitUntilTimeout = d
-	}
-}
-
-func NewSignalWaiter(signals []os.Signal, opts ...Option) *SignalWaiter {
-	ctx, cancelFunc := context.WithCancel(context.Background())
+func NewSignalWaiter(signals []os.Signal, waitTimeout time.Duration) *SignalWaiter {
 	w := &SignalWaiter{
-		signals:          signals,
-		signalC:          make(chan os.Signal),
-		ctx:              ctx,
-		cancelFunc:       cancelFunc,
-		incomingSignal:   nil,
-		hooks:            make([]func(os.Signal), 0),
-		waitUntilTimeout: 30 * time.Second,
-		stopC:            make(chan interface{}, 1),
-		RWMutex:          sync.RWMutex{},
-	}
-	for _, opt := range opts {
-		opt(w)
+		signals:        signals,
+		signalC:        make(chan os.Signal),
+		incomingSignal: nil,
+		hooks:          make([]func(os.Signal), 0),
+		waitTimeout:    waitTimeout,
+		stopC:          make(chan interface{}, 1),
+		RWMutex:        sync.RWMutex{},
 	}
 	signal.Notify(w.signalC, w.signals...)
 	return w
@@ -77,11 +46,10 @@ func (w *SignalWaiter) Kill(signum syscall.Signal) error {
 
 func (w *SignalWaiter) WaitSignals() *SignalWaiter {
 	w.incomingSignal = <-w.signalC
-	w.cancelFunc()
 	return w
 }
 
-func (w *SignalWaiter) AsyncInvokeHooks() *SignalWaiter {
+func (w *SignalWaiter) WaitHooksAsyncInvoked() *SignalWaiter {
 	go func(sig os.Signal) {
 		w.RLock()
 		defer w.RUnlock()
@@ -100,12 +68,7 @@ func (w *SignalWaiter) WaitUntilTimeout() {
 		return
 	case w.incomingSignal = <-w.signalC:
 		return
-	case <-time.After(w.waitUntilTimeout):
+	case <-time.After(w.waitTimeout):
 		return
 	}
-}
-
-// Context return context that cancels on the waiter's signals.
-func (w *SignalWaiter) Context() context.Context {
-	return w.ctx
 }

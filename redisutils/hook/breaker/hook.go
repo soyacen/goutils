@@ -183,24 +183,28 @@ func IsSuccessful(fn func(errs []error) bool) Option {
 
 // New returns a new Hook configured with the given Settings.
 func New(opts ...Option) *Hook {
-	hook := &Hook{
-		name:          "redis.breaker",
-		maxRequests:   1,
-		clearInterval: defaultClearInterval,
-		openDuration:  defaultOpenDuration,
-		readyToTrip:   defaultReadyToTrip,
-		isSuccessful:  defaultIsSuccessful,
-		onStateChange: defaultOnStateChange,
-		mutex:         sync.Mutex{},
-		state:         0,
-		generation:    0,
-		counts:        Counts{},
-		expiry:        time.Time{},
-	}
+	hook := &Hook{name: "redis.breaker"}
 	for _, opt := range opts {
 		opt(hook)
 	}
-
+	if hook.maxRequests <= 0 {
+		hook.maxRequests = 1
+	}
+	if hook.clearInterval <= 0 {
+		hook.clearInterval = defaultClearInterval
+	}
+	if hook.openDuration <= 0 {
+		hook.openDuration = defaultOpenDuration
+	}
+	if hook.readyToTrip == nil {
+		hook.readyToTrip = defaultReadyToTrip
+	}
+	if hook.isSuccessful == nil {
+		hook.isSuccessful = defaultIsSuccessful
+	}
+	if hook.onStateChange == nil {
+		hook.onStateChange = defaultOnStateChange
+	}
 	hook.toNewGeneration(time.Now())
 	return hook
 }

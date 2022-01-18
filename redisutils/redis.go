@@ -64,14 +64,17 @@ func NewSimpleRedis(opts ...Option) (*redis.Client, error) {
 
 func newSimpleRedis(o *Options) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:         o.addresses[0],
-		Username:     o.username,
-		Password:     o.password,
-		DB:           o.db,
-		PoolSize:     o.poolSize,
-		DialTimeout:  o.dialTimeout,
-		ReadTimeout:  o.readTimeout,
-		WriteTimeout: o.writeTimeout,
+		Addr:            o.addresses[0],
+		Username:        o.username,
+		Password:        o.password,
+		DB:              o.db,
+		PoolSize:        o.poolSize,
+		DialTimeout:     o.dialTimeout,
+		ReadTimeout:     o.readTimeout,
+		WriteTimeout:    o.writeTimeout,
+		MaxRetries:      o.maxRetries,
+		MinRetryBackoff: o.minRetryBackoff,
+		MaxRetryBackoff: o.maxRetryBackoff,
 	})
 	_, err := client.Ping(o.ctx).Result()
 	if err != nil {
@@ -93,15 +96,18 @@ func NewFailoverRedis(opts ...Option) (*redis.Client, error) {
 
 func newFailoverRedis(o *Options) (*redis.Client, error) {
 	failoverClient := redis.NewFailoverClient(&redis.FailoverOptions{
-		SentinelAddrs: o.addresses,
-		MasterName:    o.masterName,
-		DB:            o.db,
-		Username:      o.username,
-		Password:      o.password,
-		PoolSize:      o.poolSize,
-		DialTimeout:   o.dialTimeout,
-		ReadTimeout:   o.readTimeout,
-		WriteTimeout:  o.writeTimeout,
+		SentinelAddrs:   o.addresses,
+		MasterName:      o.masterName,
+		DB:              o.db,
+		Username:        o.username,
+		Password:        o.password,
+		PoolSize:        o.poolSize,
+		DialTimeout:     o.dialTimeout,
+		ReadTimeout:     o.readTimeout,
+		WriteTimeout:    o.writeTimeout,
+		MaxRetries:      o.maxRetries,
+		MinRetryBackoff: o.minRetryBackoff,
+		MaxRetryBackoff: o.maxRetryBackoff,
 	})
 	_, err := failoverClient.Ping(o.ctx).Result()
 	if err != nil {
@@ -123,13 +129,16 @@ func NewClusterRedis(opts ...Option) (*redis.ClusterClient, error) {
 
 func newClusterRedis(o *Options) (*redis.ClusterClient, error) {
 	clusterClient := redis.NewClusterClient(&redis.ClusterOptions{
-		Username:     o.username,
-		Password:     o.password,
-		Addrs:        o.addresses,
-		PoolSize:     o.poolSize,
-		DialTimeout:  o.dialTimeout,
-		ReadTimeout:  o.readTimeout,
-		WriteTimeout: o.writeTimeout,
+		Username:        o.username,
+		Password:        o.password,
+		Addrs:           o.addresses,
+		PoolSize:        o.poolSize,
+		DialTimeout:     o.dialTimeout,
+		ReadTimeout:     o.readTimeout,
+		WriteTimeout:    o.writeTimeout,
+		MaxRetries:      o.maxRetries,
+		MinRetryBackoff: o.minRetryBackoff,
+		MaxRetryBackoff: o.maxRetryBackoff,
 	})
 	_, err := clusterClient.Ping(o.ctx).Result()
 	if err != nil {
@@ -155,13 +164,16 @@ func newRingRedis(o *Options) (*redis.Ring, error) {
 		addrs[o.shards[i]] = o.addresses[i]
 	}
 	ringClient := redis.NewRing(&redis.RingOptions{
-		Addrs:        addrs,
-		PoolSize:     o.poolSize,
-		Username:     o.username,
-		Password:     o.password,
-		DialTimeout:  o.dialTimeout,
-		ReadTimeout:  o.readTimeout,
-		WriteTimeout: o.writeTimeout,
+		Addrs:           addrs,
+		PoolSize:        o.poolSize,
+		Username:        o.username,
+		Password:        o.password,
+		DialTimeout:     o.dialTimeout,
+		ReadTimeout:     o.readTimeout,
+		WriteTimeout:    o.writeTimeout,
+		MaxRetries:      o.maxRetries,
+		MinRetryBackoff: o.minRetryBackoff,
+		MaxRetryBackoff: o.maxRetryBackoff,
 	})
 	_, err := ringClient.Ping(o.ctx).Result()
 	if err != nil {

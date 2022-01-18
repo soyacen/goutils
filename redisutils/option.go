@@ -6,18 +6,21 @@ import (
 )
 
 type Options struct {
-	ctx          context.Context
-	addresses    []string
-	shards       []string
-	poolSize     int
-	masterName   string
-	db           int
-	username     string
-	password     string
-	clientType   string
-	dialTimeout  time.Duration
-	readTimeout  time.Duration
-	writeTimeout time.Duration
+	ctx             context.Context
+	addresses       []string
+	shards          []string
+	poolSize        int
+	masterName      string
+	db              int
+	username        string
+	password        string
+	clientType      string
+	dialTimeout     time.Duration
+	readTimeout     time.Duration
+	writeTimeout    time.Duration
+	maxRetries      int
+	minRetryBackoff time.Duration
+	maxRetryBackoff time.Duration
 }
 
 type Option func(*Options)
@@ -85,5 +88,21 @@ func WithWriteTimeout(timeout time.Duration) Option {
 func WithClientType(clientType string) Option {
 	return func(o *Options) {
 		o.clientType = clientType
+	}
+}
+
+func MaxRetries(maxRetries int) Option {
+	return func(o *Options) {
+		o.maxRetries = maxRetries
+	}
+}
+func MinRetryBackoff(minRetryBackoff time.Duration) Option {
+	return func(o *Options) {
+		o.minRetryBackoff = minRetryBackoff
+	}
+}
+func MaxRetryBackoff(maxRetryBackoff time.Duration) Option {
+	return func(o *Options) {
+		o.maxRetryBackoff = maxRetryBackoff
 	}
 }

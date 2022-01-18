@@ -1,5 +1,6 @@
 package breaker
 
+// copy from github.com/sony/gobreaker
 import (
 	"context"
 	"errors"

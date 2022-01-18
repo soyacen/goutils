@@ -25,67 +25,67 @@ type Options struct {
 
 type Option func(*Options)
 
-func WithContext(ctx context.Context) Option {
+func Context(ctx context.Context) Option {
 	return func(o *Options) {
 		o.ctx = ctx
 	}
 }
 
-func WithShards(shards []string) Option {
+func Shards(shards []string) Option {
 	return func(o *Options) {
 		o.shards = shards
 	}
 }
 
-func WithPoolSize(size int) Option {
+func PoolSize(size int) Option {
 	return func(o *Options) {
 		o.poolSize = size
 	}
 }
 
-func WithMasterName(masterName string) Option {
+func MasterName(masterName string) Option {
 	return func(o *Options) {
 		o.masterName = masterName
 	}
 }
 
-func WithDB(db int) Option {
+func DB(db int) Option {
 	return func(o *Options) {
 		o.db = db
 	}
 }
 
-func WithUsername(username string) Option {
+func Username(username string) Option {
 	return func(o *Options) {
 		o.username = username
 	}
 }
 
-func WithPassword(pwd string) Option {
+func Password(pwd string) Option {
 	return func(o *Options) {
 		o.password = pwd
 	}
 }
 
-func WithDialTimeout(timeout time.Duration) Option {
+func DialTimeout(timeout time.Duration) Option {
 	return func(o *Options) {
 		o.dialTimeout = timeout
 	}
 }
 
-func WithReadTimeout(timeout time.Duration) Option {
+func ReadTimeout(timeout time.Duration) Option {
 	return func(o *Options) {
 		o.readTimeout = timeout
 	}
 }
 
-func WithWriteTimeout(timeout time.Duration) Option {
+func WriteTimeout(timeout time.Duration) Option {
 	return func(o *Options) {
 		o.writeTimeout = timeout
 	}
 }
 
-func WithClientType(clientType string) Option {
+func ClientType(clientType string) Option {
 	return func(o *Options) {
 		o.clientType = clientType
 	}

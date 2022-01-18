@@ -12,8 +12,8 @@ import (
 
 var _ redis.Hook = &Hook{}
 
-const defaultClearInterval = time.Duration(0) * time.Second
-const defaultOpenDuration = time.Duration(60) * time.Second
+const defaultClearInterval = 0 * time.Second
+const defaultOpenDuration = 5 * time.Second
 
 func defaultReadyToTrip(counts Counts) bool {
 	return counts.ConsecutiveFailures > 5
@@ -146,7 +146,7 @@ func ClearInterval(interval time.Duration) Option {
 
 // OpenDuration is the period of the open state,
 // after which the state of the Hook becomes half-open.
-// If Timeout is less than or equal to 0, the openDuration value of the Hook is set to 60 seconds.
+// default 5 seconds.
 func OpenDuration(timeout time.Duration) Option {
 	return func(hook *Hook) {
 		hook.openDuration = timeout

@@ -12,8 +12,8 @@ import (
 
 var _ redis.Hook = &Hook{}
 
-const defaultInterval = time.Duration(0) * time.Second
-const defaultTimeout = time.Duration(60) * time.Second
+const defaultClearInterval = time.Duration(0) * time.Second
+const defaultOpenDuration = time.Duration(60) * time.Second
 
 func defaultReadyToTrip(counts Counts) bool {
 	return counts.ConsecutiveFailures > 5
@@ -104,8 +104,8 @@ func (c *Counts) clear() {
 type Hook struct {
 	name          string
 	maxRequests   uint32
-	interval      time.Duration
-	timeout       time.Duration
+	clearInterval time.Duration
+	openDuration  time.Duration
 	readyToTrip   func(counts Counts) bool
 	isSuccessful  func(errs []error) bool
 	onStateChange func(name string, from State, to State)
@@ -135,21 +135,21 @@ func MaxRequests(maxRequests uint32) Option {
 	}
 }
 
-// Interval is the cyclic period of the closed state
+// ClearInterval is the cyclic period of the closed state
 // for the Hook to clear the internal Counts.
-// If Interval is less than or equal to 0, the Hook doesn't clear internal Counts during the closed state.
-func Interval(interval time.Duration) Option {
+// If ClearInterval is less than or equal to 0, the Hook doesn't clear internal Counts during the closed state.
+func ClearInterval(interval time.Duration) Option {
 	return func(hook *Hook) {
-		hook.interval = interval
+		hook.clearInterval = interval
 	}
 }
 
-// Timeout is the period of the open state,
+// OpenDuration is the period of the open state,
 // after which the state of the Hook becomes half-open.
-// If Timeout is less than or equal to 0, the timeout value of the Hook is set to 60 seconds.
-func Timeout(timeout time.Duration) Option {
+// If Timeout is less than or equal to 0, the openDuration value of the Hook is set to 60 seconds.
+func OpenDuration(timeout time.Duration) Option {
 	return func(hook *Hook) {
-		hook.timeout = timeout
+		hook.openDuration = timeout
 	}
 }
 
@@ -185,8 +185,8 @@ func New(opts ...Option) *Hook {
 	hook := &Hook{
 		name:          "redis.breaker",
 		maxRequests:   1,
-		interval:      defaultInterval,
-		timeout:       defaultTimeout,
+		clearInterval: defaultClearInterval,
+		openDuration:  defaultOpenDuration,
 		readyToTrip:   defaultReadyToTrip,
 		isSuccessful:  defaultIsSuccessful,
 		onStateChange: defaultOnStateChange,
@@ -344,13 +344,13 @@ func (hook *Hook) toNewGeneration(now time.Time) {
 	var zero time.Time
 	switch hook.state {
 	case StateClosed:
-		if hook.interval == 0 {
+		if hook.clearInterval == 0 {
 			hook.expiry = zero
 		} else {
-			hook.expiry = now.Add(hook.interval)
+			hook.expiry = now.Add(hook.clearInterval)
 		}
 	case StateOpen:
-		hook.expiry = now.Add(hook.timeout)
+		hook.expiry = now.Add(hook.openDuration)
 	default: // StateHalfOpen
 		hook.expiry = zero
 	}

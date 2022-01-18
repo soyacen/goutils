@@ -27,6 +27,7 @@ func defaultIsSuccessful(errs []error) bool {
 		if errors.Is(err, redis.Nil) {
 			continue
 		}
+		return false
 	}
 	return true
 }

@@ -1,4 +1,4 @@
-module github.com/soyacen/goutils
+module github.com/soyacen/goutils/redisutils
 
 go 1.15
 

@@ -3,8 +3,6 @@ module github.com/soyacen/goutils
 go 1.15
 
 require (
-	codeup.aliyun.com/qimao/go-contrib/leo v0.4.2
-	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/soyacen/bytebufferpool v1.0.1

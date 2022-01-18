@@ -21,3 +21,4 @@
 /netutils/go.sum
 /fileutils/go.sum
 /retryutils/go.sum
+/redisutils/go.sum

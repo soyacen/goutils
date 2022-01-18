@@ -208,10 +208,10 @@ type generationKey struct{}
 
 func (hook *Hook) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 	generation, err := hook.beforeRequest()
+	ctx = context.WithValue(ctx, generationKey{}, generation)
 	if err != nil {
 		return ctx, err
 	}
-	ctx = context.WithValue(ctx, generationKey{}, generation)
 	return ctx, nil
 }
 

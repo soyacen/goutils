@@ -8,6 +8,9 @@ import (
 )
 
 func Call(ctx context.Context, maxAttempts uint, backoffFunc backoffutils.BackoffFunc, method func(attemptTime int) error) error {
+	if maxAttempts < 0 {
+		maxAttempts = 0
+	}
 	var err error
 	max := int(maxAttempts)
 	for i := 0; i <= max; i++ {
